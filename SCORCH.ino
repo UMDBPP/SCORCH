@@ -1,7 +1,7 @@
 const int triggerPin = 3;
 const int ledPin = 13;
 
-void setup {
+void setup() {
 	pinMode(triggerPin, OUTPUT);
 	pinMode(ledPin, OUTPUT);
 	digitalWrite(triggerPin, LOW);
@@ -12,7 +12,7 @@ void setup {
 	digitalWrite(triggerPin, LOW);
 }
 
-void loop {
+void loop() {
 	digitalWrite(ledPin, HIGH);
 	delay(1000);
 	digitalWrite(ledPin, LOW);
