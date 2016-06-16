@@ -4,28 +4,41 @@
 
 // physical definitions
 #define TRIGGER_PIN 3
-#define LED_PIN 13
+#define ARMED_LED_PIN 13
 #define XBEE_ADDR 03
+#define TLM_ADDR 04
 #define XBEE_PAN_ID 0x0B0B
+#define ARM_FCNCODE 0x000A
+#define ARM_STATUS_FCNCODE 0x0001
+#define DISARM_FCNCODE 0x000D
+#define FIRE_FCNCODE 0xFFFF
 
 // function prototypes
 void fire();
 void read_input();
 void command_response(uint8_t _fcn_code, uint8_t data[], uint8_t length);
+void arm_system();
+void disarm_system();
 
 /* program begin */
 
 // program variables
-boolean fired;
+boolean armed;
 int pkt_type;
 int bytes_read;
 uint8_t incoming_bytes[100];
 uint8_t fcn_code;
+uint8_t tlm_pos = 0;
+uint8_t tlm_data[1];
 
 void setup() {
+	
+	// disarm the system before we enable the pins
+	disarm_system();
+	
 	pinMode(TRIGGER_PIN, OUTPUT);
-	pinMode(LED_PIN, OUTPUT);
-	digitalWrite(TRIGGER_PIN, LOW);
+	pinMode(ARMED_LED_PIN, OUTPUT);
+
 	Serial.begin(9600);
 
 	if(!InitXBee(XBEE_ADDR, XBEE_PAN_ID, Serial)) {
@@ -35,22 +48,18 @@ void setup() {
 		// you're fucked
 	}
 
-	fired = false;
+	armed = false;
 	pkt_type = 0;
 	bytes_read = 0;
 	fcn_code = 0;
 }
 
 void loop() {
-	if (!fired) {
-		read_input();
-	}
-	else {
-		digitalWrite(LED_PIN, HIGH);
-		delay(1000);
-		digitalWrite(LED_PIN, LOW);
-		delay(1000);
-	}
+	
+	// look for any new messages
+	read_input();
+	// wait
+	delay(10);
 }
 
 void read_input() {
@@ -58,6 +67,7 @@ void read_input() {
 		// Read something else, try again
 		pkt_type = readMsg(1);
 	}
+	// if we didn't have a read error, process it
 	if (pkt_type > -1) {
 		if (pkt_type) {
 			bytes_read = readCmdMsg(incoming_bytes, fcn_code);
@@ -66,12 +76,49 @@ void read_input() {
 	}
 }
 
-void command_response(uint8_t _fcn_code, uint8_t data[], uint8_t length) {
-	fire();
+void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
+	// process a command to arm the system
+	if(_fcncode == ARM_FCNCODE){
+		arm_system();
+	}
+	// process a command to disarm the system
+	else if(_fcncode == DISARM_FCNCODE){
+		disarm_system();
+	}
+	// process a command to FIIIIRRRRREEEEEE!
+	else if(_fcncode == FIRE_FCNCODE){
+		// fire 
+		fire();
+		// disarm the system again to prevent repeated firings
+		disarm_system();
+	}
+	// process a command to report the arm status
+	else if(_fcncode == ARM_STATUS_FCNCODE){
+
+		tlm_pos = 0;
+		// telemetry compilation
+		tlm_pos = addIntToTlm(armed, tlm_data, tlm_pos);
+		// send the message
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
+	}
+	
+}
+
+void arm_system(){
+	armed = true;
+	digitalWrite(ARMED_LED_PIN, HIGH);
+}
+
+void disarm_system(){
+	armed = false;
+	digitalWrite(ARMED_LED_PIN, LOW);
 }
 
 void fire() {
-	digitalWrite(TRIGGER_PIN, HIGH);
-	delay(3000);
-	digitalWrite(TRIGGER_PIN, LOW);
+	// if the system is armed, fire
+	if(armed){
+		digitalWrite(TRIGGER_PIN, HIGH);
+		delay(3000);
+		digitalWrite(TRIGGER_PIN, LOW);
+	}
 }
