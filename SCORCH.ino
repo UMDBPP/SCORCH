@@ -54,25 +54,61 @@ void setup() {
 	fcn_code = 0;
 }
 
+uint8_t counter = 0;
+
 void loop() {
 	
 	// look for any new messages
 	read_input();
 	// wait
-	delay(10);
+	delay(100);
+
+/*	tlm_pos = 0;
+	tlm_pos = addIntToTlm(counter, tlm_data, tlm_pos);
+	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
+	if (counter == 255) {
+		counter = 0;
+	}
+	else {
+		counter++;
+	} */
 }
 
 void read_input() {
+	tlm_pos = 0;
+	tlm_pos = addIntToTlm(0xAD, tlm_data, tlm_pos);
+	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
+
 	if((pkt_type = readMsg(1)) == 0) {
 		// Read something else, try again
-		pkt_type = readMsg(1);
+		tlm_pos = 0;
+		tlm_pos = addIntToTlm(0xDD, tlm_data, tlm_pos);
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
+	}
+	else {
+		tlm_pos = 0;
+		tlm_pos = addIntToTlm(0xBB, tlm_data, tlm_pos);
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 	// if we didn't have a read error, process it
 	if (pkt_type > -1) {
 		if (pkt_type) {
 			bytes_read = readCmdMsg(incoming_bytes, fcn_code);
 			command_response(fcn_code, incoming_bytes, bytes_read);
+			tlm_pos = 0;
+			tlm_pos = addIntToTlm(0xBA, tlm_data, tlm_pos);
+			sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
+	}
+		else {
+			tlm_pos = 0;
+			tlm_pos = addIntToTlm(0xAA, tlm_data, tlm_pos);
+			sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 		}
+	}
+	else {
+		tlm_pos = 0;
+		tlm_pos = addIntToTlm(0xCC, tlm_data, tlm_pos);
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 }
 
@@ -101,12 +137,20 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 		// send the message
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
+	else {
+		tlm_pos = 0;
+		tlm_pos = addIntToTlm(0xFF, tlm_data, tlm_pos);
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
+	}
 	
 }
 
 void arm_system(){
 	armed = true;
 	digitalWrite(ARMED_LED_PIN, HIGH);
+	tlm_pos=0;
+	tlm_pos = addIntToTlm(0xAB, tlm_data, tlm_pos);
+	sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 }
 
 void disarm_system(){
