@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<data>
+  <loop>false</loop>
+  <repeat_times>1</repeat_times>
+  <repeat_period>500</repeat_period>
+  <frames_list>
+    <frame name="ArmStatusCmd">
+      <payload>7E001300010000000000000003001800000000000001E2</payload>
+    </frame>
+    <frame name="ArmCmd">
+      <payload>7E00130001000000000000000300180000000000000AD9</payload>
+    </frame>
+    <frame name="DisarmCmd">
+      <payload>7E00130001000000000000000300180000000000000DD6</payload>
+    </frame>
+    <frame name="FireCmd">
+      <payload>7E00130001000000000000000300180000000000000FD4</payload>
+    </frame>
+  </frames_list>
+</data>
