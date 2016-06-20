@@ -76,18 +76,18 @@ void loop() {
 
 void read_input() {
 	tlm_pos = 0;
-	tlm_pos = addIntToTlm(0xAD, tlm_data, tlm_pos);
+	tlm_pos = addIntToTlm<uint8_t>(0xAD, tlm_data, tlm_pos);
 	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
 
 	if((pkt_type = readMsg(1)) == 0) {
 		// Read something else, try again
 		tlm_pos = 0;
-		tlm_pos = addIntToTlm(0xDD, tlm_data, tlm_pos);
+		tlm_pos = addIntToTlm<uint8_t>(0xDD, tlm_data, tlm_pos);
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 	else {
 		tlm_pos = 0;
-		tlm_pos = addIntToTlm(0xBB, tlm_data, tlm_pos);
+		tlm_pos = addIntToTlm<uint8_t>(0xBB, tlm_data, tlm_pos);
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 	// if we didn't have a read error, process it
@@ -96,18 +96,18 @@ void read_input() {
 			bytes_read = readCmdMsg(incoming_bytes, fcn_code);
 			command_response(fcn_code, incoming_bytes, bytes_read);
 			tlm_pos = 0;
-			tlm_pos = addIntToTlm(0xBA, tlm_data, tlm_pos);
+			tlm_pos = addIntToTlm<uint8_t>(0xBA, tlm_data, tlm_pos);
 			sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 		else {
 			tlm_pos = 0;
-			tlm_pos = addIntToTlm(0xAA, tlm_data, tlm_pos);
+			tlm_pos = addIntToTlm<uint8_t>(0xAA, tlm_data, tlm_pos);
 			sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 		}
 	}
 	else {
 		tlm_pos = 0;
-		tlm_pos = addIntToTlm(0xCC, tlm_data, tlm_pos);
+		tlm_pos = addIntToTlm<uint8_t>(0xCC, tlm_data, tlm_pos);
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 }
@@ -139,7 +139,7 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 	}
 	else {
 		tlm_pos = 0;
-		tlm_pos = addIntToTlm(0xFF, tlm_data, tlm_pos);
+		tlm_pos = addIntToTlm<uint8_t>(0xFF, tlm_data, tlm_pos);
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 	
@@ -149,7 +149,7 @@ void arm_system(){
 	armed = true;
 	digitalWrite(ARMED_LED_PIN, HIGH);
 	tlm_pos=0;
-	tlm_pos = addIntToTlm(0xAB, tlm_data, tlm_pos);
+	tlm_pos = addIntToTlm<uint8_t>(0xAB, tlm_data, tlm_pos);
 	sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 }
 
