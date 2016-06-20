@@ -8,10 +8,10 @@
 #define XBEE_ADDR 03
 #define TLM_ADDR 04
 #define XBEE_PAN_ID 0x0B0B
-#define ARM_FCNCODE 0x000A
-#define ARM_STATUS_FCNCODE 0x0001
-#define DISARM_FCNCODE 0x000D
-#define FIRE_FCNCODE 0xFFFF
+#define ARM_FCNCODE 0x0A
+#define ARM_STATUS_FCNCODE 0x01
+#define DISARM_FCNCODE 0x0D
+#define FIRE_FCNCODE 0x0F
 
 // function prototypes
 void fire();
@@ -43,6 +43,9 @@ void setup() {
 
 	if(!InitXBee(XBEE_ADDR, XBEE_PAN_ID, Serial)) {
 		// it initialized
+		tlm_pos = 0;
+		tlm_pos = addIntToTlm<uint8_t>(0xAC, tlm_data, tlm_pos);
+		sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
 	}
 	else {
 		// you're fucked
@@ -57,58 +60,27 @@ void setup() {
 uint8_t counter = 0;
 
 void loop() {
-	
 	// look for any new messages
 	read_input();
 	// wait
 	delay(100);
-
-/*	tlm_pos = 0;
-	tlm_pos = addIntToTlm(counter, tlm_data, tlm_pos);
-	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
-	if (counter == 255) {
-		counter = 0;
-	}
-	else {
-		counter++;
-	} */
 }
 
 void read_input() {
-	tlm_pos = 0;
-	tlm_pos = addIntToTlm<uint8_t>(0xAD, tlm_data, tlm_pos);
-	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
-
 	if((pkt_type = readMsg(1)) == 0) {
 		// Read something else, try again
-		tlm_pos = 0;
-		tlm_pos = addIntToTlm<uint8_t>(0xDD, tlm_data, tlm_pos);
-		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
-	}
-	else {
-		tlm_pos = 0;
-		tlm_pos = addIntToTlm<uint8_t>(0xBB, tlm_data, tlm_pos);
-		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 	// if we didn't have a read error, process it
 	if (pkt_type > -1) {
 		if (pkt_type) {
 			bytes_read = readCmdMsg(incoming_bytes, fcn_code);
 			command_response(fcn_code, incoming_bytes, bytes_read);
-			tlm_pos = 0;
-			tlm_pos = addIntToTlm<uint8_t>(0xBA, tlm_data, tlm_pos);
-			sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 		else {
 			tlm_pos = 0;
-			tlm_pos = addIntToTlm<uint8_t>(0xAA, tlm_data, tlm_pos);
+			tlm_pos = addIntToTlm<uint8_t>(0xAF, tlm_data, tlm_pos);
 			sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 		}
-	}
-	else {
-		tlm_pos = 0;
-		tlm_pos = addIntToTlm<uint8_t>(0xCC, tlm_data, tlm_pos);
-		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 }
 
@@ -139,7 +111,7 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 	}
 	else {
 		tlm_pos = 0;
-		tlm_pos = addIntToTlm<uint8_t>(0xFF, tlm_data, tlm_pos);
+		tlm_pos = addIntToTlm<uint8_t>(0xBB, tlm_data, tlm_pos);
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
 	
@@ -149,7 +121,7 @@ void arm_system(){
 	armed = true;
 	digitalWrite(ARMED_LED_PIN, HIGH);
 	tlm_pos=0;
-	tlm_pos = addIntToTlm<uint8_t>(0xAB, tlm_data, tlm_pos);
+	tlm_pos = addIntToTlm<uint8_t>(0xAA, tlm_data, tlm_pos);
 	sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 }
 
@@ -164,5 +136,7 @@ void fire() {
 		digitalWrite(TRIGGER_PIN, HIGH);
 		delay(3000);
 		digitalWrite(TRIGGER_PIN, LOW);
-	}
+		tlm_pos=0;
+		tlm_pos = addIntToTlm<uint8_t>(0xFF, tlm_data, tlm_pos);
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);}
 }

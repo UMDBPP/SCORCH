@@ -17,7 +17,7 @@ Usage:
 
 3) Flip arm switch on box to 'ARMED'
 
-4) Dend Arm Cmd
+4) Send Arm Cmd
 
 5) Recieve packet with payload 0xAA to confirm arm
 
