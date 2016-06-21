@@ -57,8 +57,6 @@ void setup() {
 	fcn_code = 0;
 }
 
-uint8_t counter = 0;
-
 void loop() {
 	// look for any new messages
 	read_input();
@@ -75,7 +73,7 @@ void read_input() {
 		if (pkt_type) {
 			bytes_read = readCmdMsg(incoming_bytes, fcn_code);
 			command_response(fcn_code, incoming_bytes, bytes_read);
-	}
+		}
 		else {
 			tlm_pos = 0;
 			tlm_pos = addIntToTlm<uint8_t>(0xAF, tlm_data, tlm_pos);
@@ -102,7 +100,6 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 	}
 	// process a command to report the arm status
 	else if(_fcncode == ARM_STATUS_FCNCODE){
-
 		tlm_pos = 0;
 		// telemetry compilation
 		tlm_pos = addIntToTlm(armed, tlm_data, tlm_pos);
@@ -114,7 +111,6 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 		tlm_pos = addIntToTlm<uint8_t>(0xBB, tlm_data, tlm_pos);
 		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
 	}
-	
 }
 
 void arm_system(){
@@ -138,5 +134,6 @@ void fire() {
 		digitalWrite(TRIGGER_PIN, LOW);
 		tlm_pos=0;
 		tlm_pos = addIntToTlm<uint8_t>(0xFF, tlm_data, tlm_pos);
-		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);}
+		sendTlmMsg( TLM_ADDR, tlm_data, tlm_pos);
+	}
 }
