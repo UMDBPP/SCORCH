@@ -1,5 +1,6 @@
 # SCORCH
-SCORCH Payload for UMDBPP \n
+SCORCH Payload for UMDBPP
+
 String Cutdown Operated by Rocket Combustion Heat
 
 ## About
