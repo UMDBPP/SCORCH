@@ -1,6 +1,6 @@
 #include<Wire.h>
 #include<XBee.h>
-#include"ccsds_xbee.h"
+#include"deps/ccsds_xbee.h"
 
 // physical definitions
 #define TRIGGER_PIN 3
@@ -12,6 +12,10 @@
 #define ARM_STATUS_FCNCODE 0x01
 #define DISARM_FCNCODE 0x0D
 #define FIRE_FCNCODE 0x0F
+
+// behavioral constants
+#define CYCLE_DELAY 100 // time between execution cycles [ms]
+#define ARM_TIMEOUT (60000/CYCLE_DELAY) // 60 * 1000 / CYCLE_DELAY
 
 // function prototypes
 void fire();
@@ -28,11 +32,9 @@ int pkt_type;
 int bytes_read;
 uint8_t incoming_bytes[100];
 uint8_t fcn_code;
-uint8_t tlm_pos = 0;
+uint8_t tlm_pos;
 uint8_t tlm_data[1];
-int armed_ctr = -1; // counter tracking number of cycles system has been armed
-uint16_t cycle_delay = 100;   // time between execution cycles [ms]
-uint16_t arm_timeout = 60*1000/cycle_delay; // arm timeout before auto-disarming [cycles]
+int armed_ctr; // counter tracking number of cycles system has been armed
 
 void setup() {
 	// disarm the system before we enable the pins
@@ -57,6 +59,8 @@ void setup() {
 	pkt_type = 0;
 	bytes_read = 0;
 	fcn_code = 0;
+	tlm_pos = 0;
+	armed_ctr = -1;
 }
 
 void loop() {
@@ -67,11 +71,11 @@ void loop() {
 		armed_ctr++;
 	}
 	// if the system has been armed for more than the timeout, disarm
-	if(armed_ctr > arm_timeout/cycle_delay){
+	if(armed_ctr > ARM_TIMEOUT){
 		disarm_system();
 	}
 	// wait
-	delay(cycle_delay);
+	delay(CYCLE_DELAY);
 }
 
 void read_input() {
