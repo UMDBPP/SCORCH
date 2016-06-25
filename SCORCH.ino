@@ -6,7 +6,7 @@
 #define TRIGGER_PIN 3
 #define ARMED_LED_PIN 13
 #define XBEE_ADDR 03
-#define TLM_ADDR 04
+#define TLM_ADDR 02
 #define XBEE_PAN_ID 0x0B0B
 #define ARM_FCNCODE 0x0A
 #define ARM_STATUS_FCNCODE 0x01
