@@ -1,6 +1,6 @@
 #include<Wire.h>
 #include<XBee.h>
-#include"deps/ccsds_xbee.h"
+#include"CCSDS_Xbee/ccsds_xbee.h"
 
 // physical definitions
 #define TRIGGER_PIN 3
