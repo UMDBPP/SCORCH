@@ -144,6 +144,8 @@ void disarm_system(){
 	armed = false;
 	digitalWrite(ARMED_LED_PIN, LOW);
 	armed_ctr = -1;
+  one_byte_message(DISARMED_RESPONSE);
+
 }
 
 void fire() {
