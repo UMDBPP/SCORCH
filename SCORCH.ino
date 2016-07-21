@@ -49,8 +49,6 @@ int armed_ctr; // counter tracking number of cycles system has been armed
 
 /* program functions */
 void setup() {
-	// disarm the system before we enable the pins
-	disarm_system();
 
 	pinMode(TRIGGER_PIN, OUTPUT);
 	pinMode(ARMED_LED_PIN, OUTPUT);
@@ -64,6 +62,9 @@ void setup() {
 	else {
 		// you're fucked
 	}
+
+	// disarm the system before we enable the pins
+	disarm_system();
 
 	armed = false;
 	pkt_type = 0;
