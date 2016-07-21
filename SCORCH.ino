@@ -17,7 +17,7 @@
 
 /* behavioral constants */
 #define CYCLE_DELAY 100 // time between execution cycles [ms]
-#define ARM_TIMEOUT (60000/CYCLE_DELAY) // 60 * 1000 / CYCLE_DELAY
+#define ARM_TIMEOUT (600000/CYCLE_DELAY) // 60 * 1000 / CYCLE_DELAY
 
 /* response definitions */
 #define INIT_RESPONSE 0xAC
