@@ -17,13 +17,14 @@
 
 /* behavioral constants */
 #define CYCLE_DELAY 100 // time between execution cycles [ms]
-#define ARM_TIMEOUT (600000/CYCLE_DELAY) // 60 * 1000 / CYCLE_DELAY
+#define ARM_TIMEOUT (60000/CYCLE_DELAY) // 60 * 1000 / CYCLE_DELAY
 
 /* response definitions */
 #define INIT_RESPONSE 0xAC
 #define READ_FAIL_RESPONSE 0xAF
 #define BAD_COMMAND_RESPONSE 0xBB
 #define ARMED_RESPONSE 0xAA
+#define DISARMED_RESPONSE 0xDD
 #define FIRED_RESPONSE 0xFF
 
 /* function prototypes */
@@ -119,7 +120,11 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 	}
 	// process a command to report the arm status
 	else if(_fcncode == ARM_STATUS_FCNCODE){
-		one_byte_message(armed);
+		if(armed) {
+			one_byte_message(ARMED_RESPONSE);
+		} else {
+			one_byte_message(DISARMED_RESPONSE);
+		}
 	}
 	else {
 		one_byte_message(BAD_COMMAND_RESPONSE);
