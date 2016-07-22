@@ -149,6 +149,7 @@ void fire() {
 		one_byte_message(FIRED_RESPONSE);
 	}
 	// disarm the system again to prevent repeated firing attempts
+	delay(500);
 	disarm_system();
 }
 
