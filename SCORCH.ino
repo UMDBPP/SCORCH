@@ -43,10 +43,6 @@ int armed_ctr; // counter tracking number of cycles system has been armed
 
 /* program functions */
 void setup() {
-
-	pinMode(TRIGGER_PIN, OUTPUT);
-	pinMode(ARMED_LED_PIN, OUTPUT);
-
 	Serial.begin(9600);
 
 	if(!InitXBee(XBEE_ADDR, XBEE_PAN_ID, Serial)) {
@@ -59,6 +55,10 @@ void setup() {
 
 	// disarm the system before we enable the pins
 	disarm_system(); // also sets armed to false and armed_ctr to -1
+	
+	pinMode(TRIGGER_PIN, OUTPUT);
+	pinMode(ARMED_LED_PIN, OUTPUT);
+
 }
 
 void loop() {
