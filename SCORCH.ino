@@ -54,6 +54,7 @@ void setup() {
 	}
 
 	// disarm the system before we enable the pins
+	delay(500);
 	disarm_system(); // also sets armed to false and armed_ctr to -1
 	
 	pinMode(TRIGGER_PIN, OUTPUT);
