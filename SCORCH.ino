@@ -5,8 +5,8 @@
 /* physical definitions */
 #define TRIGGER_PIN 3
 #define ARMED_LED_PIN 13
-#define XBEE_ADDR 03
-#define TLM_ADDR 02
+#define SCORCH_XBEE_ADDR 03
+#define LINK_XBEE_ADDR 02
 #define XBEE_PAN_ID 0x0B0B
 
 /* function codes */
@@ -14,6 +14,10 @@
 #define ARM_STATUS_FCNCODE 0x01
 #define DISARM_FCNCODE 0x0D
 #define FIRE_FCNCODE 0x0F
+
+/* APIDs */
+#define SCORCH_STATUS_MSG_APID 10
+#define SCORCH_CMD_MSG_APID 15 // not used yet
 
 /* behavioral constants */
 #define CYCLE_DELAY 100 // time between execution cycles [ms]
@@ -45,7 +49,7 @@ int armed_ctr; // counter tracking number of cycles system has been armed
 void setup() {
 	Serial.begin(9600);
 
-	if(!InitXBee(XBEE_ADDR, XBEE_PAN_ID, Serial)) {
+	if(!InitXBee(SCORCH_XBEE_ADDR, XBEE_PAN_ID, Serial)) {
 		// it initialized
 		one_byte_message(INIT_RESPONSE);
 	}
@@ -157,5 +161,5 @@ void fire() {
 void one_byte_message(uint8_t msg) {
 	uint8_t tlm_data;
 	addIntToTlm<uint8_t>(msg, &tlm_data, (uint16_t)0);
-	sendTlmMsg(TLM_ADDR, &tlm_data, (uint16_t)1);
+	sendTlmMsg(LINK_XBEE_ADDR, SCORCH_STATUS_MSG_APID, &tlm_data, (uint16_t)1);
 }
