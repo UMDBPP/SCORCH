@@ -58,7 +58,6 @@ void setup() {
 	
 	pinMode(TRIGGER_PIN, OUTPUT);
 	pinMode(ARMED_LED_PIN, OUTPUT);
-
 }
 
 void loop() {
