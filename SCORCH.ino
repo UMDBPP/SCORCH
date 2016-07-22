@@ -1,6 +1,6 @@
-#include<Wire.h>
-#include<XBee.h>
-#include"CCSDS_Xbee/ccsds_xbee.h"
+#include <Wire.h>
+#include <XBee.h>
+#include "CCSDS_Xbee/ccsds_xbee.h"
 
 /* physical definitions */
 #define TRIGGER_PIN 3
@@ -58,10 +58,7 @@ void setup() {
 	}
 
 	// disarm the system before we enable the pins
-	disarm_system();
-
-	armed = false;
-	armed_ctr = -1;
+	disarm_system(); // also sets armed to false and armed_ctr to -1
 }
 
 void loop() {
@@ -80,10 +77,10 @@ void loop() {
 }
 
 void read_input() {
-  int pkt_type;
-  int bytes_read;
-  uint8_t fcn_code;
-  uint8_t incoming_bytes[100];
+	int pkt_type;
+	int bytes_read; // Due to XBee packet size limit, this can be a 8 bit unsigned
+	uint8_t fcn_code;
+	uint8_t incoming_bytes[100];
 
 	if((pkt_type = readMsg(1)) == 0) {
 		// Read something else, try again
@@ -118,7 +115,8 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 	else if(_fcncode == ARM_STATUS_FCNCODE){
 		if(armed) {
 			one_byte_message(ARMED_RESPONSE);
-		} else {
+		}
+		else {
 			one_byte_message(DISARMED_RESPONSE);
 		}
 	}
@@ -130,18 +128,17 @@ void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
 void arm_system(){
 	armed = true;
 	digitalWrite(ARMED_LED_PIN, HIGH);
+	armed_ctr = 1;
 
 	one_byte_message(ARMED_RESPONSE);
-
-	armed_ctr = 1;
 }
 
 void disarm_system(){
 	armed = false;
 	digitalWrite(ARMED_LED_PIN, LOW);
 	armed_ctr = -1;
-  one_byte_message(DISARMED_RESPONSE);
 
+	one_byte_message(DISARMED_RESPONSE);
 }
 
 void fire() {
@@ -157,8 +154,8 @@ void fire() {
 }
 
 void one_byte_message(uint8_t msg) {
-  uint16_t tlm_pos = 0;
-  uint8_t tlm_data[1];
+	uint16_t tlm_pos = 0; // this need not be a 16 bit integer, 8 bit unsigned is sufficient - it cycles between values 0 and 1
+	uint8_t tlm_data[1];
 	tlm_pos = addIntToTlm<uint8_t>((uint8_t)msg, tlm_data, tlm_pos);
 	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
 }
