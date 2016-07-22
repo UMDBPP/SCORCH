@@ -38,11 +38,7 @@ void one_byte_message(uint8_t msg);
 /*** program begin ***/
 
 /* program variables */
-boolean armed;
-int pkt_type;
-int bytes_read;
-uint8_t incoming_bytes[100];
-uint8_t fcn_code;
+boolean armed; // flag indicating if system is armed
 int armed_ctr; // counter tracking number of cycles system has been armed
 
 /* program functions */
@@ -65,9 +61,6 @@ void setup() {
 	disarm_system();
 
 	armed = false;
-	pkt_type = 0;
-	bytes_read = 0;
-	fcn_code = 0;
 	armed_ctr = -1;
 }
 
@@ -87,6 +80,11 @@ void loop() {
 }
 
 void read_input() {
+  int pkt_type;
+  int bytes_read;
+  uint8_t fcn_code;
+  uint8_t incoming_bytes[100];
+
 	if((pkt_type = readMsg(1)) == 0) {
 		// Read something else, try again
 	}
