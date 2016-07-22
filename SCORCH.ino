@@ -30,7 +30,7 @@
 /* function prototypes */
 void fire();
 void read_input();
-void command_response(uint8_t _fcn_code, uint8_t data[], uint8_t length);
+void command_response(uint8_t *fcn_code);
 void arm_system();
 void disarm_system();
 void one_byte_message(uint8_t msg);
@@ -78,7 +78,7 @@ void loop() {
 
 void read_input() {
 	int pkt_type;
-	int bytes_read; // Due to XBee packet size limit, this can be a 8 bit unsigned
+	int bytes_read;
 	uint8_t fcn_code;
 	uint8_t incoming_bytes[100];
 
@@ -89,7 +89,7 @@ void read_input() {
 	if (pkt_type > -1) {
 		if (pkt_type) {
 			bytes_read = readCmdMsg(incoming_bytes, fcn_code);
-			command_response(fcn_code, incoming_bytes, bytes_read);
+			command_response(&fcn_code);
 		}
 		else { // unknown packet type?
 			one_byte_message(READ_FAIL_RESPONSE);
@@ -97,22 +97,22 @@ void read_input() {
 	}
 }
 
-void command_response(uint8_t _fcncode, uint8_t data[], uint8_t length) {
+void command_response(uint8_t *fcncode) {
 	// process a command to arm the system
-	if(_fcncode == ARM_FCNCODE){
+	if(*fcncode == ARM_FCNCODE){
 		arm_system();
 	}
 	// process a command to disarm the system
-	else if(_fcncode == DISARM_FCNCODE){
+	else if(*fcncode == DISARM_FCNCODE){
 		disarm_system();
 	}
 	// process a command to FIIIIRRRRREEEEEE!
-	else if(_fcncode == FIRE_FCNCODE){
+	else if(*fcncode == FIRE_FCNCODE){
 		// fire 
 		fire();
 	}
 	// process a command to report the arm status
-	else if(_fcncode == ARM_STATUS_FCNCODE){
+	else if(*fcncode == ARM_STATUS_FCNCODE){
 		if(armed) {
 			one_byte_message(ARMED_RESPONSE);
 		}
@@ -154,8 +154,7 @@ void fire() {
 }
 
 void one_byte_message(uint8_t msg) {
-	uint16_t tlm_pos = 0; // this need not be a 16 bit integer, 8 bit unsigned is sufficient - it cycles between values 0 and 1
-	uint8_t tlm_data[1];
-	tlm_pos = addIntToTlm<uint8_t>((uint8_t)msg, tlm_data, tlm_pos);
-	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
+	uint8_t tlm_data;
+	addIntToTlm<uint8_t>(msg, &tlm_data, (uint16_t)0);
+	sendTlmMsg(TLM_ADDR, &tlm_data, (uint16_t)1);
 }
