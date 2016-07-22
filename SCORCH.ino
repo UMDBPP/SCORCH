@@ -43,8 +43,6 @@ int pkt_type;
 int bytes_read;
 uint8_t incoming_bytes[100];
 uint8_t fcn_code;
-uint8_t tlm_pos;
-uint8_t tlm_data[1];
 int armed_ctr; // counter tracking number of cycles system has been armed
 
 /* program functions */
@@ -70,7 +68,6 @@ void setup() {
 	pkt_type = 0;
 	bytes_read = 0;
 	fcn_code = 0;
-	tlm_pos = 0;
 	armed_ctr = -1;
 }
 
@@ -162,7 +159,8 @@ void fire() {
 }
 
 void one_byte_message(uint8_t msg) {
-	tlm_pos = 0;
+  uint16_t tlm_pos = 0;
+  uint8_t tlm_data[1];
 	tlm_pos = addIntToTlm<uint8_t>((uint8_t)msg, tlm_data, tlm_pos);
 	sendTlmMsg(TLM_ADDR, tlm_data, tlm_pos);
 }
