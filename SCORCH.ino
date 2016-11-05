@@ -19,9 +19,9 @@
 #define FIRE_FCNCODE 0x0F
 
 /* APIDs */
-#define SCORCH_CMD_MSG_APID 200 // not used yet
-#define SCORCH_HK_MSG_APID 210
-#define SCORCH_STATUS_MSG_APID 220
+#define SCORCH_CMD_MSG_APID 300 // not used yet
+#define SCORCH_HK_MSG_APID 310
+#define SCORCH_STATUS_MSG_APID 320
 
 /* behavioral constants */
 #define CYCLE_DELAY 100 // time between execution cycles [ms]
